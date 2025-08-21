@@ -1,3 +1,8 @@
+// 전체 앱의 공통 레이아웃
+// - 공통 헤더 포함
+// - 기본 메타데이터(title/description) 지정
+// - 메인 영역에 id="content"를 두어 Skip 링크와 연결
+
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";

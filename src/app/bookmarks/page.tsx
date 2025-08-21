@@ -1,4 +1,8 @@
 "use client";
+// 북마크 목록 페이지
+// - 로컬 스토리지에서 읽은 리스트를 출력
+// - 비어 있을 때 안내 문구 표시
+
 import { useBookmarks } from "@/app/hooks/useBookmarks";
 
 export default function Page() {

@@ -1,3 +1,7 @@
+// 홈 페이지
+// - 더미 데이터 2개를 카드로 렌더링
+// - 북마크 토글 동작 확인용
+
 import { Card } from "@/components/Card";
 
 const items = [
