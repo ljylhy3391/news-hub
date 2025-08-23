@@ -29,7 +29,7 @@ export function Card({ item }: { item: Item }) {
         <h3 className="font-medium">{item.title}</h3>
         {item.url && (
           <a
-            className="text-blue-600 underline"
+            className="text-sky-600 dark:text-sky-400 no-underline hover:underline underline-offset-2 decoration-sky-400/60 hover:text-sky-500 hover:dark:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-[2px]"
             href={item.url}
             target="_blank"
             rel="noreferrer"
