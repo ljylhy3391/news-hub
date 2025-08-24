@@ -1,8 +1,10 @@
 import data from '@/../public/data.json' assert { type: 'json' }
 import { NewsGrid } from '@/components/NewsGrid'
+import type { Entry } from '@/types/news'
 
 type Params = { tag: string }
 type Search = { sort?: 'latest' | 'popular' | string }
+type DataFile = { items: Entry[] }
 
 export default async function Page({
   params,
@@ -15,16 +17,14 @@ export default async function Page({
   const sp = searchParams ? await searchParams : undefined
   const sort = sp?.sort ?? 'latest'
 
-  const all = ((data as any).items || []) as {
-    id: string; title: string; lede?: string; url?: string; image?: string; tags?: string[]
-  }[]
+  const all: Entry[] = ((data as DataFile).items) ?? []
 
-  let list = all.filter((entry) => entry.tags?.includes(tag))
+  let list: Entry[] = all.filter((entry) => entry.tags?.includes(tag))
 
   if (sort === 'popular') {
-    // TODO: 인기 로직(향후 지표). 현재는 latest와 동일
+    // TODO: 인기 지표 연결 예정
   } else {
-    // 최신 예시: id 문자열 기준 역순(실데이터 도입 시 날짜로 변경 권장)
+    // 최신 예시: id 역순(실데이터 전환 시 날짜 기준 권장)
     list = [...list].sort((a, b) => (a.id < b.id ? 1 : -1))
   }
 

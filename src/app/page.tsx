@@ -1,12 +1,15 @@
 import SectionHeader from '@/components/SectionHeader'
 import { HeroCard } from '@/components/cards/HeroCard'
 import { NewsGrid } from '@/components/NewsGrid'
+import type { Entry } from '@/types/news'
 import data from '@/../public/data.json' assert { type: 'json' }
 
+type DataFile = { items: Entry[] }
+
 export default function Page() {
-  const items = (data as any).items || []
-  const hero = items[0]
-  const gridItems = items.slice(1, 13) // 필요 개수로 조정
+  const { items } = (data as DataFile)
+  const hero: Entry | undefined = items[0]
+  const gridItems: Entry[] = items.slice(1, 13)
 
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-10">

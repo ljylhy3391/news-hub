@@ -16,7 +16,7 @@
       "lede": "제품의 핵심 포인트를 간략히 안내합니다.",
       "url": "https://example.com/article-2",
       "image": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?q=80&w=1200&auto=format&fit=crop",
-      "tags": ["business","tech"],
+      "tags": ["business", "tech"],
       "source": "The Verge",
       "timeAgo": "5h"
     },
@@ -56,7 +56,7 @@
       "lede": "컴포넌트 중심 설계의 장점과 실제 도입기.",
       "url": "https://example.com/article-6",
       "image": "https://images.unsplash.com/photo-1495020689067-958852a7765e?q=80&w=1200&auto=format&fit=crop",
-      "tags": ["design","culture"],
+      "tags": ["design", "culture"],
       "source": "The Verge",
       "timeAgo": "2d"
     },
@@ -66,7 +66,7 @@
       "lede": "비용 가시화와 거버넌스로 지출을 줄이는 방법.",
       "url": "https://example.com/article-7",
       "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
-      "tags": ["tech","business"],
+      "tags": ["tech", "business"],
       "source": "TechCrunch",
       "timeAgo": "2d"
     },
@@ -86,7 +86,7 @@
       "lede": "밈과 플랫폼이 바꾼 소비 패턴.",
       "url": "https://example.com/article-9",
       "image": "https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?q=80&w=1200&auto=format&fit=crop",
-      "tags": ["culture","design"],
+      "tags": ["culture", "design"],
       "source": "WIRED",
       "timeAgo": "3d"
     },
@@ -96,7 +96,7 @@
       "lede": "거시 변수와 투자자 행동의 상관관계.",
       "url": "https://example.com/article-10",
       "image": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1600&auto=format&fit=crop",
-      "tags": ["business","economy"],
+      "tags": ["business", "economy"],
       "source": "FT",
       "timeAgo": "4d"
     },
