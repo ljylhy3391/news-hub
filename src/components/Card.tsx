@@ -13,7 +13,7 @@ type Item = { id: string; title: string; url?: string };
 export function Card({ item }: { item: Item }) {
   const { has, toggle } = useBookmarks();
 
-  // 마운트 여부를 추적해 SSR/C SR 출력 차이를 없앱니다.
+  // 마운트 여부를 추적해 SSR/CSR 출력 차이를 없앱니다.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);

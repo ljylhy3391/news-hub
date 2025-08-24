@@ -1,81 +1,37 @@
-// 태그별 목록 페이지 (Next 15 PageProps와 타입 정합 버전)
-// - params, searchParams를 Promise로 고정 → await 후 사용
-// - 의미 중심 변수명 및 주석 유지
+import data from '@/../public/data.json' assert { type: 'json' }
+import { NewsGrid } from '@/components/NewsGrid'
 
-import { Card } from "@/components/Card";
-
-// 도메인 타입
-type Entry = { id: string; title: string; url?: string; tags: string[] };
-const allEntries: Entry[] = [
-  {
-    id: "1",
-    title: "Next.js App Router 가이드",
-    url: "https://nextjs.org",
-    tags: ["next", "react"],
-  },
-  {
-    id: "2",
-    title: "React 공식 문서",
-    url: "https://react.dev",
-    tags: ["react"],
-  },
-  {
-    id: "3",
-    title: "웹 접근성 체크리스트",
-    url: "https://www.w3.org/WAI/",
-    tags: ["a11y", "web"],
-  },
-];
-
-// 라우트/검색 파라미터 타입
-type Params = { tag: string };
-type Search = { sort?: "latest" | "popular" | string };
+type Params = { tag: string }
+type Search = { sort?: 'latest' | 'popular' | string }
 
 export default async function Page({
   params,
-  searchParams,
+  searchParams
 }: {
-  // Next 15 생성 타입과 맞추기 위해 Promise 형태로 고정
-  params: Promise<Params>;
-  searchParams?: Promise<Search>;
+  params: Promise<Params>
+  searchParams?: Promise<Search>
 }) {
-  // 1) URL 세그먼트 해소
-  const { tag } = await params;
+  const { tag } = await params
+  const sp = searchParams ? await searchParams : undefined
+  const sort = sp?.sort ?? 'latest'
 
-  // 2) 쿼리파라미터 해소 + 기본값 처리
-  const resolvedSearch = searchParams ? await searchParams : undefined;
-  const sortOrder = resolvedSearch?.sort ?? "latest";
+  const all = ((data as any).items || []) as {
+    id: string; title: string; lede?: string; url?: string; image?: string; tags?: string[]
+  }[]
 
-  // 3) 태그 필터링
-  let filteredEntries = allEntries.filter(({ tags }) => tags.includes(tag));
+  let list = all.filter((entry) => entry.tags?.includes(tag))
 
-  // 4) 정렬(확장 포인트)
-  if (sortOrder === "popular") {
-    // TODO: 인기순 지표 기반 정렬 로직
+  if (sort === 'popular') {
+    // TODO: 인기 로직(향후 지표). 현재는 latest와 동일
   } else {
-    // latest 예시: id 내림차순
-    filteredEntries = [...filteredEntries].sort(
-      (a, b) => Number(b.id) - Number(a.id)
-    );
+    // 최신 예시: id 문자열 기준 역순(실데이터 도입 시 날짜로 변경 권장)
+    list = [...list].sort((a, b) => (a.id < b.id ? 1 : -1))
   }
 
-  // 5) 렌더링
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-3">태그: {tag}</h1>
-
-      {!filteredEntries.length ? (
-        <p>해당 태그의 항목이 없습니다.</p>
-      ) : (
-        <div className="space-y-3">
-          {filteredEntries.map((entry) => (
-            <Card
-              key={entry.id}
-              item={{ id: entry.id, title: entry.title, url: entry.url }}
-            />
-          ))}
-        </div>
-      )}
-    </>
-  );
+    <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-bold">태그: {tag}</h1>
+      {list.length ? <NewsGrid items={list} /> : <p>해당 태그의 기사가 없습니다.</p>}
+    </main>
+  )
 }

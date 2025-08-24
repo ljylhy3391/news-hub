@@ -46,3 +46,6 @@ next-env.d.ts
 # IDEs
 .vscode/
 .idea/
+
+# Local design rules
+principles/news-ui.json
