@@ -1,10 +1,14 @@
-import data from '@/../public/data.json' assert { type: 'json' }
 import { NewsGrid } from '@/components/NewsGrid'
 import type { Entry } from '@/types/news'
 
 type Params = { tag: string }
 type Search = { sort?: 'latest' | 'popular' | string }
-type DataFile = { items: Entry[] }
+
+async function getFeed() {
+  const res = await fetch('/api/feed', { next: { revalidate: 600 } })
+  if (!res.ok) return { items: [] as Entry[] }
+  return res.json() as Promise<{ items: Entry[] }>
+}
 
 export default async function Page({
   params,
@@ -17,14 +21,12 @@ export default async function Page({
   const sp = searchParams ? await searchParams : undefined
   const sort = sp?.sort ?? 'latest'
 
-  const all: Entry[] = ((data as DataFile).items) ?? []
-
-  let list: Entry[] = all.filter((entry) => entry.tags?.includes(tag))
+  const { items } = await getFeed()
+  let list = items.filter((e) => e.tags?.includes(tag))
 
   if (sort === 'popular') {
-    // TODO: 인기 지표 연결 예정
+    // TODO: 인기 지표 연결(예: 클릭/북마크 수)
   } else {
-    // 최신 예시: id 역순(실데이터 전환 시 날짜 기준 권장)
     list = [...list].sort((a, b) => (a.id < b.id ? 1 : -1))
   }
 

@@ -17,12 +17,12 @@ export function NewsCard({ item }: { item: Entry }) {
           sizes="(max-width: 640px) 100vw, 400px"
         />
       )}
-      <div className="p-4 space-y-2">
+      <div className="p-4 space-y-2.5">
         <div className="flex gap-2">
           {shown.map((tag) => (
             <span
               key={tag}
-              className="inline-block text-xs px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300"
+              className="inline-block text-xs px-2 py-0.5 rounded bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 leading-[1]"
             >
               {tag}
             </span>
