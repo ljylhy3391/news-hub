@@ -15,7 +15,7 @@ export default async function Page() {
       {hero && (
         <>
           <SectionHeader title="헤드라인" />
-          <HeroCard item={hero} />
+          <HeroCard item={hero} size="sm" />
         </>
       )}
       <SectionHeader title="최신 기사" actionHref="/tags/tech" />
