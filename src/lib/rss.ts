@@ -1,4 +1,3 @@
-// src/lib/rss.ts
 import Parser from "rss-parser";
 import he from "he";
 import type { Entry } from "@/types/news";

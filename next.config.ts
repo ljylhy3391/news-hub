@@ -1,4 +1,3 @@
-// next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -11,6 +10,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i0.wp.com" },
       // 신규 추가(이번 에러의 진짜 원인)
       { protocol: "https", hostname: "platform.theverge.com" },
+      { protocol: "https", hostname: "ichef.bbci.co.uk" },
     ],
     formats: ["image/avif", "image/webp"],
   },
