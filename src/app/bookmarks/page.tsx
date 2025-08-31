@@ -1,41 +1,28 @@
 "use client";
-// 북마크 목록 페이지
-// - 로컬 스토리지에서 읽은 리스트를 출력
-// - 비어 있을 때 안내 문구 표시
-
+import { useEffect, useState } from "react";
+import { NewsGrid } from "@/components/NewsGrid";
 import { useBookmarks } from "@/app/hooks/useBookmarks";
+import type { Entry } from "@/types/news";
 
 export default function Page() {
   const { list } = useBookmarks();
-
-  if (!list.length) {
-    return (
-      <p className="p-2">
-        아직 북마크가 없습니다. 원하는 카드에서 ☆를 눌러 추가해 보세요.
-      </p>
-    );
-  }
-
+  const [items, setItems] = useState<Entry[]>([]);
+  useEffect(() => {
+    fetch("/api/feed")
+      .then((r) => r.json())
+      .then((d) => setItems(d.items as Entry[]))
+      .catch(() => setItems([]));
+  }, []);
+  const ids = new Set(list.map((b) => b.id));
+  const bookmarked = items.filter((e) => ids.has(e.id));
   return (
-    <>
-      <h1 className="text-xl font-semibold mb-3">내 북마크</h1>
-      <ul className="space-y-3">
-        {list.map((i) => (
-          <li key={i.id} className="border rounded p-3">
-            <div className="font-medium">{i.title}</div>
-            {i.url && (
-              <a
-                className="text-blue-600 underline"
-                href={i.url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                원문 보기
-              </a>
-            )}
-          </li>
-        ))}
-      </ul>
-    </>
+    <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-bold">북마크</h1>
+      {bookmarked.length ? (
+        <NewsGrid items={bookmarked} />
+      ) : (
+        <p>저장된 기사가 없습니다.</p>
+      )}
+    </main>
   );
 }
