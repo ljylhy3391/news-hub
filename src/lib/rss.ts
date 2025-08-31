@@ -38,15 +38,19 @@ const parser = new Parser<ParsedItem>({
 });
 
 // 보조 정규식들
-const reAnyImgUrl = /\bhttps?:\/\/[^\s"'()]+/i; // 폭넓은 URL(확장자 없어도)
+const reAnyImgUrl = /\bhttps?:\/\/[^\s"'()]+/i;
 const reImgUrlWithExt =
   /\bhttps?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^"' ]*)?/i;
-const reProtocolRelative =
-  /(?:https?:)?\/\/[^\s"']+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^"' ]*)?/i;
 const reImgSrc = /<img[^>]+src=["']([^"']+)["']/i;
 const reImgSrcset = /<img[^>]+srcset=["']([^"']+)["']/i;
-const reOgImage =
-  /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i;
+const reOgImage1 =
+  /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["'][^>]*>/i;
+const reOgImage2 =
+  /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["'][^>]*>/i;
+const reTwImage1 =
+  /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["'][^>]*>/i;
+const reTwImage2 =
+  /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["'][^>]*>/i;
 const reBgImage =
   /background-image\s*:\s*url\((['"]?)(https?:\/\/[^)"']+)\1\)/i;
 
@@ -55,51 +59,70 @@ const pickUrl = (v?: { url?: string } | string): string | undefined =>
 
 function normalizeProtocol(url: string | undefined): string | undefined {
   if (!url) return undefined;
-  if (url.startsWith("//")) return "https:" + url;
-  return url;
+  const cleaned = url.trim().replace(/&amp;/g, "&");
+  if (cleaned.startsWith("//")) return "https:" + cleaned;
+  return cleaned;
 }
 
-// content HTML에서 가장 신뢰도 높은 이미지 한 장을 고르는 함수
+// srcset에서 가장 큰 w 후보(없으면 첫 후보) 선택
+function pickFromSrcset(srcset: string): string | undefined {
+  const candidates = srcset
+    .split(",")
+    .map((s) => s.trim())
+    .map((s) => {
+      const [u, sz] = s.split(/\s+/);
+      const w = sz?.endsWith("w") ? parseInt(sz) : undefined;
+      return { u, w };
+    })
+    .filter((x) => !!x.u);
+  if (!candidates.length) return undefined;
+  candidates.sort((a, b) => (b.w ?? 0) - (a.w ?? 0));
+  return normalizeProtocol(candidates[0].u);
+}
+
+// content HTML에서 대표 이미지 한 장 선택(메타 우선)
 function extractImageFromHtml(html: string): { url?: string; via?: string } {
-  // 1) srcset의 첫 URL
-  const mSrcset = reImgSrcset.exec(html);
-  if (mSrcset?.[1]) {
-    const first = mSrcset[1].split(",")[0].trim().split(" ")[0];
-    const u = normalizeProtocol(first);
-    if (u) return { url: u, via: "srcset" };
+  // 1) og:image / og:image:secure_url
+  let m = html.match(reOgImage1) || html.match(reOgImage2);
+  if (m?.[1]) {
+    const u = normalizeProtocol(m[1]);
+    if (u) return { url: u, via: "og:image" };
   }
 
-  // 2) img src
+  // 2) twitter:image / twitter:image:src
+  m = html.match(reTwImage1) || html.match(reTwImage2);
+  if (m?.[1]) {
+    const u = normalizeProtocol(m[1]);
+    if (u) return { url: u, via: "twitter:image" };
+  }
+
+  // 3) img srcset
+  const mSrcset = reImgSrcset.exec(html);
+  if (mSrcset?.[1]) {
+    const u = pickFromSrcset(mSrcset[1]);
+    if (u) return { url: u, via: "img:srcset" };
+  }
+
+  // 4) img src(확장자 포함)
   const mSrc = reImgSrc.exec(html);
   if (mSrc?.[1]) {
     const u = normalizeProtocol(mSrc[1]);
-    if (u) return { url: u, via: "img-src" };
+    if (u && /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(u)) {
+      return { url: u, via: "img:src" };
+    }
   }
 
-  // 3) og:image 메타
-  const mOg = reOgImage.exec(html);
-  if (mOg?.[1]) {
-    const u = normalizeProtocol(mOg[1]);
-    if (u) return { url: u, via: "og-image" };
-  }
-
-  // 4) background-image: url(...)
+  // 5) background-image
   const mBg = reBgImage.exec(html);
-  if (mBg?.[2]) {
-    return { url: mBg[2], via: "bg-image" };
-  }
+  if (mBg?.[2]) return { url: normalizeProtocol(mBg[2]), via: "bg-image" };
 
-  // 5) 텍스트 안의 광범위한 이미지 URL(확장자 포함)
+  // 6) 텍스트 내 확장자 URL
   const mExt = reImgUrlWithExt.exec(html);
-  if (mExt?.[0]) {
-    return { url: mExt[0], via: "text-ext" };
-  }
+  if (mExt?.[0]) return { url: normalizeProtocol(mExt[0]), via: "text-url" };
 
-  // 6) 확장자 없지만 URL처럼 보이는 링크(마지막 보루)
+  // 7) 확장자 없지만 URL처럼 보이는 링크(최후의 보루)
   const mAny = reAnyImgUrl.exec(html);
-  if (mAny?.[0]) {
-    return { url: mAny[0], via: "text-any" };
-  }
+  if (mAny?.[0]) return { url: normalizeProtocol(mAny[0]), via: "text-any" };
 
   return {};
 }
@@ -124,6 +147,7 @@ export async function fetchFromRss(source: {
       it.content ??
       "";
 
+    // media 우선 후보(객체/문자열 모두 대응)
     const mc = it.mediaContent ?? it["media:content"];
     const mt = it.mediaThumbnail ?? it["media:thumbnail"];
     const mediaUrl = normalizeProtocol(pickUrl(mc) ?? pickUrl(mt));
@@ -131,14 +155,23 @@ export async function fetchFromRss(source: {
     // 우선순위: enclosure → media → HTML에서 추출
     let image = it.enclosure?.url;
     let via = "enclosure";
-    if (!image) {
+
+    if (!image && mediaUrl) {
       image = mediaUrl;
-      via = image ? "media" : via;
+      via = "media";
     }
+
     if (!image) {
       const { url, via: v } = extractImageFromHtml(String(rawSnippet));
       image = url;
       via = v ?? "none";
+    }
+
+    // 최종 안전화(프로토콜 상대, 엔티티 등)
+    image = normalizeProtocol(image);
+    // data: URL 등 비정상 패턴 스킵
+    if (image && /^data:/i.test(image)) {
+      image = undefined;
     }
 
     const pubDate = it.isoDate
@@ -161,8 +194,8 @@ export async function fetchFromRss(source: {
       pubDate,
     };
 
-    if (DEBUG_PER_ITEM) {
-      // 항목별 매칭 경로(시끄러움)
+    // 항목별 상세 로그(개발/프리뷰에서만)
+    if (DEBUG_PER_ITEM && process.env.NODE_ENV !== "production") {
       // eslint-disable-next-line no-console
       console.log("[RSS:ITEM]", source.name, {
         title: entry.title.slice(0, 60),
@@ -170,6 +203,8 @@ export async function fetchFromRss(source: {
         image,
       });
     }
+
+    // 매칭 샘플 기록(최대 N개)
     if (image && matchSamples.length < DEBUG_MAX_MATCH_SAMPLES) {
       matchSamples.push({ title: entry.title.slice(0, 60), via, url: image });
     }
@@ -177,17 +212,19 @@ export async function fetchFromRss(source: {
     return entry;
   });
 
-  // 집계 로그
+  // 집계 로그(요약 + 개발 시 상세)
   try {
     const total = entries.length;
     const withImage = entries.filter((e) => !!e.image).length;
     const ratio = total ? ((withImage / total) * 100).toFixed(1) : "0.0";
+
+    // 요약
     console.log(
       `[RSS] ${source.name}: images ${withImage}/${total} (${ratio}%)`
     );
 
-    // 어떤 경로로 매칭되었는지 샘플
-    if (matchSamples.length) {
+    // 개발/프리뷰에서만 상세
+    if (matchSamples.length && process.env.NODE_ENV !== "production") {
       console.log(`[RSS] ${source.name}: match samples`, matchSamples);
     }
 
@@ -196,6 +233,8 @@ export async function fetchFromRss(source: {
         entries
           .map((e) => e.image)
           .filter((u): u is string => !!u)
+          .map((u) => normalizeProtocol(u))
+          .filter((u): u is string => !!u && !/^data:/i.test(u))
           .map((u) => {
             try {
               return new URL(u).hostname;
@@ -206,11 +245,11 @@ export async function fetchFromRss(source: {
           .filter((h): h is string => !!h)
       )
     );
-    if (hosts.length) {
+    if (hosts.length && process.env.NODE_ENV !== "production") {
       console.log(`[RSS] ${source.name}: image hosts`, hosts.slice(0, 10));
     }
 
-    if (withImage < total) {
+    if (withImage < total && process.env.NODE_ENV !== "production") {
       const noImgTitles = entries
         .filter((e) => !e.image)
         .slice(0, DEBUG_MAX_NOIMG_SAMPLES)
