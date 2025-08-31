@@ -195,14 +195,14 @@ export async function fetchFromRss(source: {
     };
 
     // 항목별 상세 로그(개발/프리뷰에서만)
-    if (DEBUG_PER_ITEM && process.env.NODE_ENV !== "production") {
-      // eslint-disable-next-line no-console
-      console.log("[RSS:ITEM]", source.name, {
-        title: entry.title.slice(0, 60),
-        via,
-        image,
-      });
-    }
+    // if (DEBUG_PER_ITEM && process.env.NODE_ENV !== "production") {
+    //   // eslint-disable-next-line no-console
+    //   console.log("[RSS:ITEM]", source.name, {
+    //     title: entry.title.slice(0, 60),
+    //     via,
+    //     image,
+    //   });
+    // }
 
     // 매칭 샘플 기록(최대 N개)
     if (image && matchSamples.length < DEBUG_MAX_MATCH_SAMPLES) {
@@ -219,14 +219,14 @@ export async function fetchFromRss(source: {
     const ratio = total ? ((withImage / total) * 100).toFixed(1) : "0.0";
 
     // 요약
-    console.log(
-      `[RSS] ${source.name}: images ${withImage}/${total} (${ratio}%)`
-    );
+    // console.log(
+    //   `[RSS] ${source.name}: images ${withImage}/${total} (${ratio}%)`
+    // );
 
     // 개발/프리뷰에서만 상세
-    if (matchSamples.length && process.env.NODE_ENV !== "production") {
-      console.log(`[RSS] ${source.name}: match samples`, matchSamples);
-    }
+    // if (matchSamples.length && process.env.NODE_ENV !== "production") {
+    //   console.log(`[RSS] ${source.name}: match samples`, matchSamples);
+    // }
 
     const hosts = Array.from(
       new Set(
@@ -245,17 +245,17 @@ export async function fetchFromRss(source: {
           .filter((h): h is string => !!h)
       )
     );
-    if (hosts.length && process.env.NODE_ENV !== "production") {
-      console.log(`[RSS] ${source.name}: image hosts`, hosts.slice(0, 10));
-    }
+    // if (hosts.length && process.env.NODE_ENV !== "production") {
+    //   console.log(`[RSS] ${source.name}: image hosts`, hosts.slice(0, 10));
+    // }
 
-    if (withImage < total && process.env.NODE_ENV !== "production") {
-      const noImgTitles = entries
-        .filter((e) => !e.image)
-        .slice(0, DEBUG_MAX_NOIMG_SAMPLES)
-        .map((e) => e.title.slice(0, 60));
-      console.warn(`[RSS] ${source.name}: NO_IMAGE sample`, noImgTitles);
-    }
+    // if (withImage < total && process.env.NODE_ENV !== "production") {
+    //   const noImgTitles = entries
+    //     .filter((e) => !e.image)
+    //     .slice(0, DEBUG_MAX_NOIMG_SAMPLES)
+    //     .map((e) => e.title.slice(0, 60));
+    //   console.warn(`[RSS] ${source.name}: NO_IMAGE sample`, noImgTitles);
+    // }
   } catch {
     // 로그 오류 무시
   }

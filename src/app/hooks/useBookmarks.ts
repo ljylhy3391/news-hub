@@ -6,7 +6,13 @@
 
 import { useLocalStorage } from "./useLocalStorage";
 
-export type BookmarkItem = { id: string; title: string; url?: string };
+export type BookmarkItem = {
+  id: string;
+  title: string;
+  url?: string;
+  source?: string;
+  savedAt: number;
+};
 
 export function useBookmarks() {
   // 'bookmarks' 키로 로컬 스토리지에 저장

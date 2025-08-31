@@ -144,70 +144,71 @@ async function fetchOgImage(
  * 이미지가 없는 항목 일부만(상위 limit개) og:image로 보강합니다.
  * - 동시성 제한으로 안정화
  */
+
+// 1) resolveMissingImages에 preferTag 추가
 async function resolveMissingImages(
   entries: Entry[],
-  limit = ENRICH_LIMIT_DEFAULT
+  limit = ENRICH_LIMIT_DEFAULT,
+  preferTag?: string
 ): Promise<Entry[]> {
-  const targets = entries.filter((e) => !e.image && !!e.url).slice(0, limit);
+  // 원래 순서를 잃지 않도록 인덱스 보관
+  const indexed = entries.map((e, idx) => ({ e, idx }));
 
+  // 이미지 없는 항목 중에서 우선순위: preferTag 포함 → 원래 순서
+  const targets = indexed
+    .filter(({ e }) => !e.image && !!e.url)
+    .sort((a, b) => {
+      const ap = preferTag && a.e.tags?.includes(preferTag) ? 0 : 1;
+      const bp = preferTag && b.e.tags?.includes(preferTag) ? 0 : 1;
+      return ap - bp || a.idx - b.idx;
+    })
+    .slice(0, limit);
+
+  // 동시성 제한 로직은 기존 그대로 사용
   const queue = [...targets];
-  const patched: Entry[] = [];
+  const patched: { id: string; entry: Entry }[] = [];
+
   async function worker() {
-    const e = queue.shift();
-    if (!e) return;
-    const img = e.url ? await fetchOgImage(e.url) : undefined;
-    patched.push(img ? { ...e, image: img } : e);
+    const t = queue.shift();
+    if (!t) return;
+    const img = t.e.url ? await fetchOgImage(t.e.url) : undefined;
+    const merged = img ? { ...t.e, image: img } : t.e;
+    patched.push({ id: merged.id, entry: merged });
     return worker();
   }
+
   await Promise.all(
     Array.from({ length: Math.min(ENRICH_CONCURRENCY, queue.length) }, worker)
   );
 
-  // 패치 결과를 원본에 반영
-  const patchedMap = new Map<string, Entry>(patched.map((p) => [p.id, p]));
+  const patchedMap = new Map(patched.map((p) => [p.id, p.entry]));
   return entries.map((e) => patchedMap.get(e.id) ?? e);
 }
 
-/**
- * 여러 RSS 소스를 병합·정렬하여 반환합니다.
- * - limit: 최종 반환 개수(기본 60)
- * - enrichLimit: og:image 폴백을 적용할 상위 개수(기본 10)
- */
+// 2) getFeedEntries에서 preferTag를 인자로 전달
 export async function getFeedEntries(
   limit = 60,
-  enrichLimit = ENRICH_LIMIT_DEFAULT
+  enrichLimit = ENRICH_LIMIT_DEFAULT,
+  preferTag?: string
 ): Promise<Entry[]> {
-  // 1) 소스 병렬 수집(실패 소스는 건너뜀)
   const results = await Promise.allSettled(RSS_SOURCES.map(fetchFromRss));
-
-  // 2) 성공 항목 병합
   const merged: Entry[] = [];
   for (const r of results)
     if (r.status === "fulfilled") merged.push(...r.value);
 
-  // 3) 중복 제거(id 우선, 보조 키로 source:url)
   const byKey = new Map<string, Entry>();
   for (const e of merged) {
     const key = e.id || `${e.source}:${e.url}`;
     if (!byKey.has(key)) byKey.set(key, e);
   }
   const unique = Array.from(byKey.values());
-
-  // 4) 최신순 정렬(pubDate ↓, 동률이면 id 보조 정렬)
   unique.sort((a, b) => b.pubDate - a.pubDate || (a.id < b.id ? 1 : -1));
 
-  // 5) 상위 N개만 og:image 폴백 적용
-  const enriched = await resolveMissingImages(unique, enrichLimit);
+  // preferTag 우선으로 폴백 적용
+  const enriched = await resolveMissingImages(unique, enrichLimit, preferTag);
 
-  // (선택) 보강 후 집계 로그
-  // eslint-disable-next-line no-console
-  console.log(
-    "[FEED] enriched images",
-    enriched.filter((e) => !!e.image).length,
-    "/",
-    enriched.length
-  );
+  // (선택) 집계 로그 유지
+  // console.log('[FEED] enriched images', enriched.filter(e=>!!e.image).length, '/', enriched.length)
 
-  // 6) 상한 적용 후 반환
   return enriched.slice(0, limit);
 }

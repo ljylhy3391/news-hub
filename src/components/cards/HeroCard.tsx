@@ -1,6 +1,7 @@
 // src/components/cards/HeroCard.tsx
 import Image from "next/image";
 import type { Entry } from "@/types/news";
+import BookmarkButton from "@/components/BookmarkButton";
 
 type Size = "sm" | "md";
 
@@ -23,7 +24,7 @@ export function HeroCard({ item, size = "sm" }: { item: Entry; size?: Size }) {
   const m = map[size];
   return (
     <article
-      className={`${m.article} rounded-xl overflow-hidden border bg-white text-slate-900 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100`}
+      className={`${m.article} relative rounded-xl overflow-hidden border bg-white text-slate-900 dark:border-neutral-800 dark:bg-neutral-900 dark:text-slate-100`}
     >
       {item.image ? (
         <Image
@@ -37,6 +38,14 @@ export function HeroCard({ item, size = "sm" }: { item: Entry; size?: Size }) {
       ) : (
         <div className="aspect-video w-full bg-slate-200/10" />
       )}
+      <div className="absolute right-2 top-1 z-10">
+        <BookmarkButton
+          id={item.id}
+          title={item.title}
+          url={item.url}
+          source={item.source}
+        />
+      </div>
       <div className={m.pad}>
         {item.tags?.[0] && (
           <span className="inline-block text-xs px-2 py-0.5 rounded leading-[1] bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">

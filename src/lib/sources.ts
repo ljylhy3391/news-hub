@@ -13,9 +13,9 @@ export const RSS_SOURCES = [
   { name: "BBC-KO", url: "https://www.bbc.co.uk/korean/index.xml", tag: "kr" },
 
   // 보강 소스
-  // {
-  //   name: "GuardianWorld",
-  //   url: "https://www.theguardian.com/world/rss",
-  //   tag: "world",
-  // },
+  {
+    name: "GuardianWorld",
+    url: "https://www.theguardian.com/world/rss",
+    tag: "world",
+  },
 ];
