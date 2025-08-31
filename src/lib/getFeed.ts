@@ -34,9 +34,7 @@ function normalizeUrl(u?: string | null): string | undefined {
   return trimmed;
 }
 
-function stripHtml(text: string): string {
-  return text.replace(/<[^>]+>/g, " ");
-}
+
 
 // srcset에서 첫 번째 후보(보통 가장 작거나 선언 순) 또는 가장 큰 w를 선택
 function pickFromSrcset(
@@ -131,7 +129,7 @@ async function fetchOgImage(
     const normalized = normalizeUrl(found);
     setCachedOg(url, normalized);
     return normalized;
-  } catch (e) {
+  } catch {
     // 필요 시 상세 로그:
     // console.warn('[ENRICH] og:image fetch failed:', url, e)
     return undefined;

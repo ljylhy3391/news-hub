@@ -3,9 +3,7 @@ import he from "he";
 import type { Entry } from "@/types/news";
 
 // ===== 설정(로그 범위) =====
-const DEBUG_MAX_NOIMG_SAMPLES = 5; // 이미지 없는 항목 제목 샘플
 const DEBUG_MAX_MATCH_SAMPLES = 5; // 매칭 경로 샘플(어느 패스로 잡혔는지)
-const DEBUG_PER_ITEM = false; // true면 항목별 매칭 결과까지 모두 로그(매우 시끄러움)
 
 type ParsedItem = {
   enclosure?: { url?: string };
@@ -214,39 +212,10 @@ export async function fetchFromRss(source: {
 
   // 집계 로그(요약 + 개발 시 상세)
   try {
-    const total = entries.length;
-    const withImage = entries.filter((e) => !!e.image).length;
-    const ratio = total ? ((withImage / total) * 100).toFixed(1) : "0.0";
-
-    // 요약
-    // console.log(
-    //   `[RSS] ${source.name}: images ${withImage}/${total} (${ratio}%)`
-    // );
 
     // 개발/프리뷰에서만 상세
     // if (matchSamples.length && process.env.NODE_ENV !== "production") {
     //   console.log(`[RSS] ${source.name}: match samples`, matchSamples);
-    // }
-
-    const hosts = Array.from(
-      new Set(
-        entries
-          .map((e) => e.image)
-          .filter((u): u is string => !!u)
-          .map((u) => normalizeProtocol(u))
-          .filter((u): u is string => !!u && !/^data:/i.test(u))
-          .map((u) => {
-            try {
-              return new URL(u).hostname;
-            } catch {
-              return null;
-            }
-          })
-          .filter((h): h is string => !!h)
-      )
-    );
-    // if (hosts.length && process.env.NODE_ENV !== "production") {
-    //   console.log(`[RSS] ${source.name}: image hosts`, hosts.slice(0, 10));
     // }
 
     // if (withImage < total && process.env.NODE_ENV !== "production") {

@@ -9,3 +9,11 @@ export type Entry = {
   timeAgo: string; // 빈 문자열 가능(클라이언트 계산 예정)
   pubDate: number; // 게시 시각 타임스탬프(정렬 기준)
 };
+
+export type BookmarkItem = {
+  id: string;
+  title: string;
+  url?: string;
+  source?: string;
+  savedAt: number;
+};

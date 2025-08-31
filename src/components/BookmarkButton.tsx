@@ -25,7 +25,7 @@ export default function BookmarkButton({
           title,
           url,
           source,
-          savedAt: 0,
+          // savedAt: 0,
         });
       }}
       className={`px-2 py-1 rounded text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70
