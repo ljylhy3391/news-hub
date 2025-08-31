@@ -11,7 +11,6 @@ export type BookmarkItem = {
   title: string;
   url?: string;
   source?: string;
-  savedAt: number;
 };
 
 export function useBookmarks() {
