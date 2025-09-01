@@ -1,4 +1,3 @@
-// src/next.config.ts
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -16,8 +15,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "i.guim.co.uk" },
 
       // 필요 시 이미 사용 중이면 함께 추가
-      // { protocol: "https", hostname: "media.guim.co.uk" },
-      // { protocol: "https", hostname: "ichef.bbci.co.uk" },
+      { protocol: "https", hostname: "media.guim.co.uk" },
+      { protocol: "https", hostname: "ichef.bbci.co.uk" },
       // { protocol: "https", hostname: "img.hani.co.kr" },
       // { protocol: "https", hostname: "img.yna.co.kr" },
     ],
