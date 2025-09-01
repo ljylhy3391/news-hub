@@ -1,4 +1,3 @@
-// src/app/tags/[tag]/page.tsx
 import { getFeedEntries } from "@/lib/getFeed";
 import LoadMore from "./LoadMore";
 import { notFound } from "next/navigation";
@@ -6,7 +5,6 @@ import { notFound } from "next/navigation";
 export const revalidate = 600;
 
 type TagPageProps = {
-  // Next.js 15: Promise 타입으로 선언
   params: Promise<{ tag: string }>;
   searchParams: Promise<
     { sort?: "latest" | "popular" | string } & Record<string, string | string[]>
@@ -14,15 +12,14 @@ type TagPageProps = {
 };
 
 export default async function TagPage({ params, searchParams }: TagPageProps) {
-  // 비동기 props 먼저 해제
   const { tag } = await params;
   if (!tag) notFound();
 
   const { sort: rawSort } = await searchParams;
-  const sort = (typeof rawSort === "string" ? rawSort : "latest") ?? "latest";
+  const sort = typeof rawSort === "string" ? rawSort : "latest";
 
-  // 태그 우선 폴백(필요하면 두 번째 인자 조절: 예) tech는 24)
-  const items = await getFeedEntries(60, 13, tag);
+  const enrichLimit = tag === "tech" ? 24 : 13;
+  const items = await getFeedEntries(60, enrichLimit, tag);
 
   const key = tag.toLowerCase();
   let list = items.filter((e) => e.tags?.some((t) => t.toLowerCase() === key));

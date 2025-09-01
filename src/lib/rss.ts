@@ -192,16 +192,6 @@ export async function fetchFromRss(source: {
       pubDate,
     };
 
-    // 항목별 상세 로그(개발/프리뷰에서만)
-    // if (DEBUG_PER_ITEM && process.env.NODE_ENV !== "production") {
-    //   // eslint-disable-next-line no-console
-    //   console.log("[RSS:ITEM]", source.name, {
-    //     title: entry.title.slice(0, 60),
-    //     via,
-    //     image,
-    //   });
-    // }
-
     // 매칭 샘플 기록(최대 N개)
     if (image && matchSamples.length < DEBUG_MAX_MATCH_SAMPLES) {
       matchSamples.push({ title: entry.title.slice(0, 60), via, url: image });
@@ -209,25 +199,6 @@ export async function fetchFromRss(source: {
 
     return entry;
   });
-
-  // 집계 로그(요약 + 개발 시 상세)
-  try {
-
-    // 개발/프리뷰에서만 상세
-    // if (matchSamples.length && process.env.NODE_ENV !== "production") {
-    //   console.log(`[RSS] ${source.name}: match samples`, matchSamples);
-    // }
-
-    // if (withImage < total && process.env.NODE_ENV !== "production") {
-    //   const noImgTitles = entries
-    //     .filter((e) => !e.image)
-    //     .slice(0, DEBUG_MAX_NOIMG_SAMPLES)
-    //     .map((e) => e.title.slice(0, 60));
-    //   console.warn(`[RSS] ${source.name}: NO_IMAGE sample`, noImgTitles);
-    // }
-  } catch {
-    // 로그 오류 무시
-  }
 
   return entries;
 }
