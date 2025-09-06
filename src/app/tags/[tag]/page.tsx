@@ -11,6 +11,12 @@ type TagPageProps = {
   >;
 };
 
+// UI 파라미터
+const INITIAL_COUNT = 13;
+const STEP = 12;
+// 예상 더보기 횟수(필요 시 2 → 3 등으로만 조정)
+const EXPECTED_LOADS = 2;
+
 export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { tag } = await params;
   if (!tag) notFound();
@@ -18,7 +24,9 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { sort: rawSort } = await searchParams;
   const sort = typeof rawSort === "string" ? rawSort : "latest";
 
-  const enrichLimit = tag === "tech" ? 24 : 13;
+  // 하드코딩 제거: UI 파라미터 기반 동적 보강 한도
+  const enrichLimit = Math.min(60, INITIAL_COUNT + STEP * EXPECTED_LOADS);
+
   const items = await getFeedEntries(60, enrichLimit, tag);
 
   const key = tag.toLowerCase();
@@ -32,7 +40,13 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
     <main className="max-w-5xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">태그: {tag}</h1>
       {list.length ? (
-        <LoadMore items={list} initialCount={13} step={12} />
+        <LoadMore
+          items={list}
+          tag={tag}
+          sort={sort}
+          initialCount={INITIAL_COUNT}
+          step={STEP}
+        />
       ) : (
         <p>‘{tag}’ 태그의 기사가 없습니다.</p>
       )}

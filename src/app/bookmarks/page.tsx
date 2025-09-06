@@ -1,55 +1,37 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { NewsGrid } from "@/components/NewsGrid";
 import { useBookmarks } from "@/app/hooks/useBookmarks";
+import { useMemo } from "react";
 import type { Entry } from "@/types/news";
 
 export default function BookmarksPage() {
-  const { list } = useBookmarks();
-  const [items, setItems] = useState<Entry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { list, ready } = useBookmarks();
 
-  useEffect(() => {
-    let alive = true;
-    fetch("/api/feed")
-      .then((r) => r.json())
-      .then((d) => {
-        if (alive) setItems(d.items as Entry[]);
-      })
-      .catch(() => {
-        if (alive) setItems([]);
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  const bookmarked = useMemo(() => {
-    if (!items.length || !list.length) return [];
-    const byId = new Map(list.map((b) => [b.id, b.savedAt]));
-    return items
-      .filter((e) => byId.has(e.id))
-      .sort((a, b) => byId.get(b.id)! - byId.get(a.id)!);
-  }, [items, list]);
-
-  if (loading) {
-    return (
-      <main className="max-w-5xl mx-auto p-6 space-y-6">
-        <h1 className="text-2xl font-bold">북마크</h1>
-        <p>불러오는 중…</p>
-      </main>
-    );
-  }
+  const items: Entry[] = useMemo(() => {
+    if (!ready) return [];
+    return [...list]
+      .sort((a, b) => b.savedAt - a.savedAt)
+      .map((b) => ({
+        id: b.id,
+        title: b.title ?? "",
+        lede: "",
+        url: b.url || "#",
+        image: undefined,
+        tags: [],
+        source: b.source ?? "",
+        timeAgo: "",
+        pubDate: b.savedAt,
+      }));
+  }, [list, ready]);
 
   return (
     <main className="max-w-5xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">북마크</h1>
-      {bookmarked.length ? (
-        <NewsGrid items={bookmarked} />
+      {!ready ? (
+        <p>불러오는 중…</p>
+      ) : items.length ? (
+        <NewsGrid items={items} />
       ) : (
         <p>저장된 기사가 없습니다.</p>
       )}
