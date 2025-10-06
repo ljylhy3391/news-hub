@@ -17,7 +17,7 @@ export default function BookmarksPage() {
         title: b.title ?? "",
         lede: "",
         url: b.url || "#",
-        image: undefined,
+        image: b.image,
         tags: [],
         source: b.source ?? "",
         timeAgo: "",
@@ -26,14 +26,14 @@ export default function BookmarksPage() {
   }, [list, ready]);
 
   return (
-    <main className="max-w-5xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">북마크</h1>
+    <main className="max-w-6xl mx-auto px-6 space-y-8">
+      <h1 className="text-2xl font-bold text-slate-100">북마크</h1>
       {!ready ? (
-        <p>불러오는 중…</p>
+        <p className="text-slate-400">불러오는 중…</p>
       ) : items.length ? (
         <NewsGrid items={items} />
       ) : (
-        <p>저장된 기사가 없습니다.</p>
+        <p className="text-slate-400">저장된 기사가 없습니다.</p>
       )}
     </main>
   );

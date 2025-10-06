@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "product": "News Hub",
+    "version": "1.0.0",
+    "updatedAt": "2025-08-25",
+    "intent": [
+      "현대적 뉴스/매거진 레이아웃",
+      "실무형 가독성(본문 18px, line-height 1.6)",
+      "하늘색 링크 톤, 호버 시 밑줄"
+    ]
+  },
+  "brand": {
+    "tone": "light",
+    "primary": "#1D4ED8",
+    "linkSky": "#0EA5E9",
+    "neutral": {
+      "bg": "#FFFFFF",
+      "ink": "#111111",
+      "mutedInk": "#475569",
+      "divider": "#E2E8F0"
+    }
+  },
+  "typography": {
+    "bodyPx": 18,
+    "lineHeight": 1.6,
+    "titlePx": {
+      "card": 20,
+      "section": 24
+    }
+  },
+  "layout": {
+    "contentMaxWidth": 1280,
+    "grid": {
+      "home": [3, 2, 1],
+      "gapPx": 24
+    },
+    "sectionGapPx": 32
+  },
+  "components": {
+    "links": {
+      "baseClass": "text-sky-600 no-underline",
+      "hoverClass": "hover:underline underline-offset-2 decoration-sky-400/60",
+      "focusRing": "focus-visible:ring-2 focus-visible:ring-sky-400/70 rounded-[2px]"
+    },
+    "card": {
+      "imageRatio": "16:9",
+      "titleLines": 2,
+      "ledeLines": 3,
+      "tagChip": {
+        "bg": "sky-50",
+        "ink": "sky-700"
+      }
+    },
+    "list": {
+      "density": ["regular", "compact"],
+      "rowHeightPx": 92
+    }
+  },
+  "states": {
+    "empty": "조건을 선택하거나 검색해 기사를 불러오세요.",
+    "loading": "기사를 불러오는 중입니다…",
+    "error": "기사를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+    "noResult": "해당 조건에 맞는 기사가 없습니다."
+  },
+  "accessibility": {
+    "contrast": "AA",
+    "focusVisible": true,
+    "keyboard": [
+      "Tab/Shift+Tab 포커스 이동",
+      "Enter 링크 이동"
+    ]
+  }
+}

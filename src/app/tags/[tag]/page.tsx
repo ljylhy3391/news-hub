@@ -1,4 +1,5 @@
 import { getFeedEntries } from "@/lib/getFeed";
+import { getTagLabel } from "@/lib/tagLabels";
 import LoadMore from "./LoadMore";
 import { notFound } from "next/navigation";
 
@@ -21,6 +22,8 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   const { tag } = await params;
   if (!tag) notFound();
 
+  const tagLabel = getTagLabel(tag);
+
   const { sort: rawSort } = await searchParams;
   const sort = typeof rawSort === "string" ? rawSort : "latest";
 
@@ -37,8 +40,8 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   }
 
   return (
-    <main className="max-w-5xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">태그: {tag}</h1>
+    <main className="max-w-6xl mx-auto px-6 space-y-8">
+      <h1 className="text-2xl font-bold text-slate-100">태그: {tagLabel}</h1>
       {list.length ? (
         <LoadMore
           items={list}
@@ -48,7 +51,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
           step={STEP}
         />
       ) : (
-        <p>‘{tag}’ 태그의 기사가 없습니다.</p>
+        <p className="text-slate-400">&lsquo;{tagLabel}&rsquo; 태그의 기사가 없습니다.</p>
       )}
     </main>
   );

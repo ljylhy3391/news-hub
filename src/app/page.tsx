@@ -11,7 +11,7 @@ export default async function Page() {
   const gridItems: Entry[] = items.slice(1, 13);
 
   return (
-    <main className="max-w-5xl mx-auto p-6 space-y-10">
+    <main className="max-w-6xl mx-auto px-6 space-y-12">
       {hero && (
         <>
           <SectionHeader title="헤드라인" />

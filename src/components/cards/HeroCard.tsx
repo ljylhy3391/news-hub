@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Entry } from "@/types/news";
 import BookmarkButton from "@/components/BookmarkButton";
 import { isAnimatedImage } from "@/lib/isAnimatedImage";
+import { getTagLabel } from "@/lib/tagLabels";
 
 type Size = "sm" | "md";
 
@@ -44,22 +45,27 @@ export function HeroCard({ item, size = "sm" }: { item: Entry; size?: Size }) {
         <div className="aspect-video w-full bg-slate-200/10" />
       )}
 
+      {/* 태그 배지 - 좌상단 고정 */}
+      {item.tags?.[0] && (
+        <div className="absolute left-3 top-3 z-10">
+          <span className="inline-block text-[11px] px-2 py-0.5 rounded-full bg-sky-600/90 text-white leading-[1]">
+            {getTagLabel(item.tags[0])}
+          </span>
+        </div>
+      )}
+
+      {/* 북마크 버튼 - 우상단 고정 */}
       <div className="absolute right-3 top-3 z-10">
         <BookmarkButton
           id={item.id}
           title={item.title}
           url={item.url}
+          image={item.image}
           source={item.source}
         />
       </div>
 
       <div className={m.pad}>
-        {item.tags?.[0] && (
-          <span className="inline-block text-xs px-2 py-0.5 rounded leading-[1] bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300">
-            {item.tags[0]}
-          </span>
-        )}
-
         <h3 className={`${m.title} font-bold leading-snug line-clamp-2`}>
           {item.title}
         </h3>

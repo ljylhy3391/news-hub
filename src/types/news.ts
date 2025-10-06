@@ -30,6 +30,7 @@ export type BookmarkItem = {
   id: string;
   title: string;
   url?: string;
+  image?: string; // 북마크에서 이미지 보존
   source?: string;
   savedAt: number; // 저장 시각(최신순 정렬에 사용; ms)
 };

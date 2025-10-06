@@ -65,7 +65,7 @@ export default function LoadMore({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <NewsGrid items={items} />
       {hasMore && (
         <div className="flex justify-center">
@@ -73,7 +73,7 @@ export default function LoadMore({
             type="button"
             onClick={onMore}
             disabled={pending}
-            className="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 disabled:opacity-60 disabled:cursor-not-allowed dark:bg-neutral-800 dark:hover:bg-neutral-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70"
+            className="px-6 py-3 rounded-full bg-sky-600 hover:bg-sky-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/70"
           >
             {pending ? "불러오는 중..." : "더 보기"}
           </button>
