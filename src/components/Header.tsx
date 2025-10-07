@@ -9,6 +9,8 @@ export default function Header() {
   const pathname = usePathname() ?? "";
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+  const [isDrawerClosing, setIsDrawerClosing] = useState(false);
+  const [isDrawerOpening, setIsDrawerOpening] = useState(false);
 
   const tagToLink = (tag: string) => ({
     href: `/tags/${tag}`,
@@ -37,6 +39,25 @@ export default function Header() {
       return;
     }
     setIsDropdownOpen(false);
+  };
+
+  const openDrawer = () => {
+    setIsMobileDrawerOpen(true);
+    setIsDrawerOpening(true);
+    // 다음 프레임에서 애니메이션 시작
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setIsDrawerOpening(false);
+      }, 10);
+    });
+  };
+
+  const closeDrawer = () => {
+    setIsDrawerClosing(true);
+    setTimeout(() => {
+      setIsMobileDrawerOpen(false);
+      setIsDrawerClosing(false);
+    }, 500); // 애니메이션 duration과 맞춤 (500ms)
   };
 
   // Pill 형태의 메뉴 스타일 - 둥근 라운드, 작은 그림자
@@ -139,7 +160,7 @@ export default function Header() {
 
           {/* 모바일 메뉴 버튼 */}
           <button
-            onClick={() => setIsMobileDrawerOpen(true)}
+            onClick={openDrawer}
             className="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
             aria-label="메뉴 열기"
           >
@@ -161,22 +182,33 @@ export default function Header() {
       </header>
 
       {/* 모바일 드로어 */}
-      {isMobileDrawerOpen && (
+      {(isMobileDrawerOpen || isDrawerClosing) && (
         <>
-          {/* 오버레이 */}
+          {/* 오버레이 - 페이드 인/아웃 애니메이션 */}
           <div
-            className="fixed inset-0 bg-black/50 z-40 md:hidden"
-            onClick={() => setIsMobileDrawerOpen(false)}
+            className={`fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity duration-200 ${
+              isDrawerClosing ? "opacity-0" : "opacity-100"
+            }`}
+            onClick={closeDrawer}
           />
 
-          {/* 드로어 */}
-          <div className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-neutral-900 shadow-xl z-50 md:hidden">
+          {/* 드로어 - 슬라이드 인/아웃 애니메이션 */}
+          <div
+            className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-neutral-900 shadow-xl z-50 md:hidden transition-transform duration-500 ease-in-out"
+            style={{
+              transform: isDrawerClosing
+                ? "translateX(100%)"
+                : isDrawerOpening
+                ? "translateX(100%)"
+                : "translateX(0%)",
+            }}
+          >
             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-neutral-700">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 메뉴
               </h2>
               <button
-                onClick={() => setIsMobileDrawerOpen(false)}
+                onClick={closeDrawer}
                 className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
                 aria-label="메뉴 닫기"
               >
@@ -207,7 +239,7 @@ export default function Header() {
                       key={href}
                       {...linkProps(href, mode)}
                       href={href}
-                      onClick={() => setIsMobileDrawerOpen(false)}
+                      onClick={closeDrawer}
                       className="block"
                     >
                       {label}
@@ -226,7 +258,7 @@ export default function Header() {
                       key={href}
                       href={href}
                       className="block px-4 py-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
-                      onClick={() => setIsMobileDrawerOpen(false)}
+                      onClick={closeDrawer}
                     >
                       {label}
                     </Link>
