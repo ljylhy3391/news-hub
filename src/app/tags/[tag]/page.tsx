@@ -30,7 +30,7 @@ export default async function TagPage({ params, searchParams }: TagPageProps) {
   // 하드코딩 제거: UI 파라미터 기반 동적 보강 한도
   const enrichLimit = Math.min(60, INITIAL_COUNT + STEP * EXPECTED_LOADS);
 
-  const items = await getFeedEntries(60, enrichLimit, tag);
+  const items = await getFeedEntries(60, enrichLimit, tag, tag);
 
   const key = tag.toLowerCase();
   let list = items.filter((e) => e.tags?.some((t) => t.toLowerCase() === key));

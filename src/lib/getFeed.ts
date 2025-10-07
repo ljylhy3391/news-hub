@@ -187,7 +187,8 @@ async function resolveMissingImages(
 export async function getFeedEntries(
   limit = 60,
   enrichLimit = ENRICH_LIMIT_DEFAULT,
-  preferTag?: string
+  preferTag?: string,
+  filterTag?: string
 ): Promise<Entry[]> {
   const results = await Promise.allSettled(RSS_SOURCES.map(fetchFromRss));
   const merged: Entry[] = [];
@@ -205,8 +206,15 @@ export async function getFeedEntries(
   // preferTag 우선으로 폴백 적용
   const enriched = await resolveMissingImages(unique, enrichLimit, preferTag);
 
+  const normalizedFilter = filterTag?.trim().toLowerCase();
+  const filtered = normalizedFilter
+    ? enriched.filter((entry) =>
+        entry.tags?.some((tag) => tag.toLowerCase() === normalizedFilter)
+      )
+    : enriched;
+
   // (선택) 집계 로그 유지
   // console.log('[FEED] enriched images', enriched.filter(e=>!!e.image).length, '/', enriched.length)
 
-  return enriched.slice(0, limit);
+  return filtered.slice(0, limit);
 }

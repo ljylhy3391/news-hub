@@ -82,18 +82,18 @@ export const RSS_SOURCES = [
 
   // 건강
   {
-    name: "WebMD",
-    url: "https://rssfeeds.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC",
+    name: "NPRHealth",
+    url: "https://feeds.npr.org/1007/rss.xml",
     tag: "health",
   },
   {
-    name: "HealthLine",
-    url: "https://www.healthline.com/health-news.rss",
+    name: "USATodayHealth",
+    url: "https://rssfeeds.usatoday.com/UsatodaycomHealth-TopStories",
     tag: "health",
   },
   {
     name: "MedicalNewsToday",
-    url: "https://www.medicalnewstoday.com/rss",
+    url: "http://rss.medicalnewstoday.com/featurednews.xml",
     tag: "health",
   },
 

@@ -19,7 +19,7 @@ export async function fetchMoreEntries({
   const TOTAL = 60;
   const enrichLimit = Math.min(TOTAL, offset + count);
 
-  const all = await getFeedEntries(TOTAL, enrichLimit, tag);
+  const all = await getFeedEntries(TOTAL, enrichLimit, tag, tag);
 
   const key = tag.toLowerCase();
   let list = all.filter((e) => e.tags?.some((t) => t.toLowerCase() === key));

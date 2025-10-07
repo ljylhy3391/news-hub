@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.espncdn.com" },
       { protocol: "https", hostname: "e0.365dm.com" },
       { protocol: "https", hostname: "e1.365dm.com" },
+      { protocol: "https", hostname: "e2.365dm.com" }, // Sky Sports CDN variant
 
       // 엔터테인먼트
       { protocol: "https", hostname: "images.entertainmentweekly.com" },
@@ -43,6 +44,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "img.webmd.com" },
       { protocol: "https", hostname: "post.healthline.com" },
       { protocol: "https", hostname: "cdn.medicalnewstoday.com" },
+      { protocol: "https", hostname: "post.medicalnewstoday.com" },
+      { protocol: "https", hostname: "images.everydayhealth.com" },
+      { protocol: "https", hostname: "media.npr.org" },
+      { protocol: "https", hostname: "gannett-cdn.com" },
+      { protocol: "https", hostname: "www.gannett-cdn.com" },
+      { protocol: "https", hostname: "npr.brightspotcdn.com" },
 
       // 기타 범용 이미지 CDN
       { protocol: "https", hostname: "images.unsplash.com" },
